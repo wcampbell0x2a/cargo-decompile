@@ -20,10 +20,15 @@ OPTIONS:
 ```
 
 ## Example
+
+For instance, check the ghidra output of a function quickly with and without cpu features.
 ```
 > git clone https://github.com/rsadsb/dump1090_rs
 > cd dump1090_rs
+```
 
+### without
+```
 > cargo rz-ghidra -s to_mag --release --bin dump1090
 void sym.dump1090_rs::utils::to_mag::h21b8408e85bb7f8c(void *arg1, int64_t arg2, int64_t arg3)
 {
@@ -70,7 +75,10 @@ void sym.dump1090_rs::utils::to_mag::h21b8408e85bb7f8c(void *arg1, int64_t arg2,
     }
     return;
 }
+```
 
+### with
+```
 > RUSTFLAGS="-C target-cpu=native" cargo rz-ghidra -s mag --release --bin dump1090
 void sym.dump1090_rs::utils::to_mag::hc0809f05591c941a(void *arg1, int64_t arg2, int64_t arg3)
 {
@@ -128,6 +136,6 @@ void sym.dump1090_rs::utils::to_mag::hc0809f05591c941a(void *arg1, int64_t arg2,
 ```
 
 ## Assumptions
-- rizinn installed
+- rizin installed
 - rz-ghidra installed
 - CARGO_TARGET_DIR=target
