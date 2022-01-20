@@ -14,22 +14,38 @@ struct Opts {
     #[clap(long, short)]
     s: String,
 
-    /// cargo --release
+    /// compiler --release
     #[clap(long, short)]
     release: bool,
 
-    /// cargo --bin
+    /// compiler --bin
     #[clap(long, short)]
     bin: String,
+
+    /// compiler --target, if defined use cross compiler(disable RUSTFLAGS)
+    #[clap(long, short)]
+    target: Option<String>,
 }
 
 fn main() {
     let opts = Opts::parse();
 
-    let mut cargo_build = Command::new("cargo");
+    // choose target compiler
+    let compiler = if opts.target.is_some() {
+        "cross"
+    } else {
+        "cargo"
+    };
+
+    let mut cargo_build = Command::new(compiler);
     cargo_build.arg("build");
+    cargo_build.arg("--workspace");
+
+    // bin
     cargo_build.arg("--bin");
     cargo_build.arg(&opts.bin);
+
+    // release
     let mode = if opts.release {
         cargo_build.arg("--release");
         "release"
@@ -37,21 +53,34 @@ fn main() {
         "debug"
     };
 
+    let target_path = if let Some(ref target) = opts.target {
+        cargo_build.arg("--target");
+        cargo_build.arg(target);
+        format!("target/{}", target)
+    } else {
+        "target".to_string()
+    };
+
     // Read the RUSTFLAGS environment variable
-    let rustflags = ::std::env::var_os("RUSTFLAGS")
-        .unwrap_or_default()
-        .into_string()
-        .expect("RUSTFLAGS are not valid UTF-8");
-    cargo_build.env("RUSTFLAGS", rustflags);
+    if opts.target.is_none() {
+        let rustflags = ::std::env::var_os("RUSTFLAGS")
+            .unwrap_or_default()
+            .into_string()
+            .expect("RUSTFLAGS are not valid UTF-8");
+        cargo_build.env("RUSTFLAGS", rustflags);
+    }
 
-    let _ = cargo_build.output().unwrap();
+    println!("[-] running: {:?}", cargo_build);
+    let output = cargo_build.output().unwrap();
+    println!("{:?}", output);
 
-    let binpath = format!("./target/{}/{}", mode, opts.bin);
+    let binpath = format!("./{}/{}/{}", target_path, mode, opts.bin);
 
+    println!("{binpath}");
     let mut rz = RzPipe::spawn(binpath, None).unwrap();
 
     let _ = rz.cmd("aa").unwrap();
-    let output = rz.cmd(&format!("pdg @ $(is~{}[1])", opts.s)).unwrap();
+    let output = rz.cmd(&format!("pdg @ $(afl~{}[0])", opts.s)).unwrap();
     println!("{}", output);
 
     rz.close();
