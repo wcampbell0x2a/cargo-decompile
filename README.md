@@ -13,15 +13,16 @@ USAGE:
     cargo-rz-ghidra [OPTIONS] --s <S> --bin <BIN> <NAME>
 
 OPTIONS:
-    -b, --bin <BIN>    cargo --bin
-    -h, --help         Print help information
-    -r, --release      cargo --release
-    -s, --s <S>        function symbol used in rizin for ghidra decompile
+    -b, --bin <BIN>          compiler --bin
+    -h, --help               Print help information
+    -r, --release            compiler --release
+    -s, --s <S>              function symbol used in rizin for ghidra decompile
+    -t, --target <TARGET>    compiler --target, if defined use cross compiler(disable RUSTFLAGS)
 ```
 
 ## Example
 
-For instance, check the ghidra output of a function quickly with and without cpu features.
+For instance, check the ghidra output of a function quickly with and without native cpu features.
 ```
 > git clone https://github.com/rsadsb/dump1090_rs
 > cd dump1090_rs
