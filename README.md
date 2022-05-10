@@ -1,23 +1,24 @@
-# cargo-rz-ghidra
-A cargo subcommand that displays ghidra function output through the use of the rizin rz-ghidra project.
+# cargo-decompile
+A cargo subcommand that displays decompilation of functions through the use of {rizin, r2}-ghidra
 
 # Install
 ```
-cargo install --git https://github.com/wcampbell0x2a/cargo-rz-ghidra
+cargo install --git https://github.com/wcampbell0x2a/cargo-rz
 ```
 # Usage
 ```
-cargo-rz-ghidra
+cargo-decompile
 
 USAGE:
-    cargo-rz-ghidra [OPTIONS] --s <S> --bin <BIN> <NAME>
+    cargo-decompile [OPTIONS] --s <S> --bin <BIN> --tool <TOOL>
 
 OPTIONS:
-    -b, --bin <BIN>          compiler --bin
+        --bin <BIN>          compiler --bin
     -h, --help               Print help information
-    -r, --release            compiler --release
+        --release            compiler --release
     -s, --s <S>              function symbol used in rizin for ghidra decompile
-    -t, --target <TARGET>    compiler --target, if defined use cross compiler(disable RUSTFLAGS)
+        --target <TARGET>    compiler --target, if defined use cross compiler(disable RUSTFLAGS)
+        --tool <TOOL>        rizin or radare2
 ```
 
 ## Example
@@ -30,7 +31,7 @@ For instance, check the ghidra output of a function quickly with and without nat
 
 ### without
 ```
-> cargo rz-ghidra -s to_mag --release --bin dump1090
+> cargo-decompile -s to_mag --release --bin dump1090
 void sym.dump1090_rs::utils::to_mag::h21b8408e85bb7f8c(void *arg1, int64_t arg2, int64_t arg3)
 {
     float fVar1;
@@ -80,7 +81,7 @@ void sym.dump1090_rs::utils::to_mag::h21b8408e85bb7f8c(void *arg1, int64_t arg2,
 
 ### with
 ```
-> RUSTFLAGS="-C target-cpu=native" cargo rz-ghidra -s mag --release --bin dump1090
+> RUSTFLAGS="-C target-cpu=native" cargo-decompile -s mag --release --bin dump1090
 void sym.dump1090_rs::utils::to_mag::hc0809f05591c941a(void *arg1, int64_t arg2, int64_t arg3)
 {
     undefined auVar1 [16];
@@ -135,8 +136,3 @@ void sym.dump1090_rs::utils::to_mag::hc0809f05591c941a(void *arg1, int64_t arg2,
     return;
 }
 ```
-
-## Assumptions
-- rizin installed
-- rz-ghidra installed
-- CARGO_TARGET_DIR=target

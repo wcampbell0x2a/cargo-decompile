@@ -1,30 +1,48 @@
-use clap::Parser;
-use rzpipe::RzPipe;
-use std::process::Command;
+use std::{process::Command, str::FromStr};
 
-// TODO: support --target
+use clap::Parser;
+use r2pipe::R2Pipe;
+use rzpipe::RzPipe;
+
+#[derive(Debug, Clone, Parser)]
+enum Tool {
+    Rizin,
+    Radare2,
+}
+
+impl FromStr for Tool {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "rizin" => Ok(Self::Rizin),
+            "radare2" => Ok(Self::Radare2),
+            _ => Err("unknown tool".to_string()),
+        }
+    }
+}
 
 #[derive(Debug, Clone, Parser)]
 struct Opts {
-    /// since this is a clap sub-command, this is always rz-ghidra
-    #[clap(hide(true))]
-    _name: String,
-
     /// function symbol used in rizin for ghidra decompile
     #[clap(long, short)]
     s: String,
 
     /// compiler --release
-    #[clap(long, short)]
+    #[clap(long)]
     release: bool,
 
     /// compiler --bin
-    #[clap(long, short)]
+    #[clap(long)]
     bin: String,
 
     /// compiler --target, if defined use cross compiler(disable RUSTFLAGS)
-    #[clap(long, short)]
+    #[clap(long)]
     target: Option<String>,
+
+    /// rizin or radare2
+    #[clap(long)]
+    tool: Tool,
 }
 
 fn main() {
@@ -75,13 +93,28 @@ fn main() {
     println!("{:?}", output);
 
     let binpath = format!("./{}/{}/{}", target_path, mode, opts.bin);
-
     println!("{binpath}");
-    let mut rz = RzPipe::spawn(binpath, None).unwrap();
 
-    let _ = rz.cmd("aa").unwrap();
-    let output = rz.cmd(&format!("pdg @ $(afl~{}[0])", opts.s)).unwrap();
-    println!("{}", output);
+    let cmd = format!("pdg @ $(afl~{}[0])", opts.s);
 
-    rz.close();
+    match opts.tool {
+        Tool::Rizin => {
+            let mut rz = RzPipe::spawn(binpath, None).unwrap();
+
+            let _ = rz.cmd("aa").unwrap();
+            let output = rz.cmd(&cmd).unwrap();
+            println!("{}", output);
+
+            rz.close();
+        }
+        Tool::Radare2 => {
+            let mut r2 = R2Pipe::spawn(binpath, None).unwrap();
+
+            let _ = r2.cmd("aa").unwrap();
+            let output = r2.cmd(&cmd).unwrap();
+            println!("{}", output);
+
+            r2.close();
+        }
+    }
 }

@@ -88,10 +88,11 @@ dependencies = [
 ]
 
 [[package]]
-name = "cargo-rz-ghidra"
+name = "cargo-decompile"
 version = "0.1.0"
 dependencies = [
  "clap",
+ "r2pipe",
  "rzpipe",
 ]
 
@@ -879,6 +880,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "47aa80447ce4daf1717500037052af176af5d38cc3e571d9ec1c7353fc10c87d"
 dependencies = [
  "proc-macro2",
+]
+
+[[package]]
+name = "r2pipe"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f5df51314abf1268f60ccc8667882bbca357e2b409114a108b4e1ffda6a65645"
+dependencies = [
+ "libc",
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "thiserror",
 ]
 
 [[package]]

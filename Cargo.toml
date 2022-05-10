@@ -1,10 +1,11 @@
 [package]
-name = "cargo-rz-ghidra"
+name = "cargo-decompile"
 version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-clap = { version = "3.0", features = ["derive"] }
+clap = { version = "3.0.0", features = ["derive"] }
 rzpipe = { git = "https://github.com/rizinorg/rz-pipe.git", branch = "master" }
+r2pipe = "0.6.0"
