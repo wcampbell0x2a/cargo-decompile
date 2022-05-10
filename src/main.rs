@@ -4,8 +4,8 @@ use clap::Parser;
 use r2pipe::R2Pipe;
 use rzpipe::RzPipe;
 use syntect::easy::HighlightLines;
+use syntect::highlighting::{Style, ThemeSet};
 use syntect::parsing::SyntaxSet;
-use syntect::highlighting::{ThemeSet, Style};
 use syntect::util::{as_24_bit_terminal_escaped, LinesWithEndings};
 
 #[derive(Debug, Clone, Parser)]
@@ -127,11 +127,11 @@ fn main() {
         let ts = ThemeSet::load_defaults();
         let syntax = ps.find_syntax_by_extension("c").unwrap();
         let mut h = HighlightLines::new(syntax, &ts.themes["base16-ocean.dark"]);
-        for line in LinesWithEndings::from(&output) { // LinesWithEndings enables use of newlines mode
+        for line in LinesWithEndings::from(&output) {
+            // LinesWithEndings enables use of newlines mode
             let ranges: Vec<(Style, &str)> = h.highlight_line(line, &ps).unwrap();
             let escaped = as_24_bit_terminal_escaped(&ranges[..], true);
             print!("{}", escaped);
         }
     }
-
 }
