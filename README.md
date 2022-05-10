@@ -3,7 +3,7 @@ A cargo subcommand that displays decompilation of functions through the use of {
 
 # Install
 ```
-cargo install --git https://github.com/wcampbell0x2a/cargo-rz
+cargo install --git https://github.com/wcampbell0x2a/cargo-decompile
 ```
 # Usage
 ```
@@ -16,7 +16,7 @@ OPTIONS:
         --bin <BIN>          compiler --bin
     -h, --help               Print help information
         --release            compiler --release
-    -s, --s <S>              function symbol used in rizin for ghidra decompile
+    -s, --s <S>              function symbol used for ghidra decompile
         --target <TARGET>    compiler --target, if defined use cross compiler(disable RUSTFLAGS)
         --tool <TOOL>        rizin or radare2
 ```
