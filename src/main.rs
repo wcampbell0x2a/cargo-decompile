@@ -3,6 +3,10 @@ use std::{process::Command, str::FromStr};
 use clap::Parser;
 use r2pipe::R2Pipe;
 use rzpipe::RzPipe;
+use syntect::easy::HighlightLines;
+use syntect::parsing::SyntaxSet;
+use syntect::highlighting::{ThemeSet, Style};
+use syntect::util::{as_24_bit_terminal_escaped, LinesWithEndings};
 
 #[derive(Debug, Clone, Parser)]
 enum Tool {
@@ -97,13 +101,13 @@ fn main() {
 
     let cmd = format!("pdg @ $(afl~{}[0])", opts.s);
 
+    let mut output = None;
     match opts.tool {
         Tool::Rizin => {
             let mut rz = RzPipe::spawn(binpath, None).unwrap();
 
             let _ = rz.cmd("aa").unwrap();
-            let output = rz.cmd(&cmd).unwrap();
-            println!("{}", output);
+            output = Some(rz.cmd(&cmd).unwrap());
 
             rz.close();
         }
@@ -111,10 +115,23 @@ fn main() {
             let mut r2 = R2Pipe::spawn(binpath, None).unwrap();
 
             let _ = r2.cmd("aa").unwrap();
-            let output = r2.cmd(&cmd).unwrap();
-            println!("{}", output);
+            output = Some(r2.cmd(&cmd).unwrap());
 
             r2.close();
         }
     }
+    println!("{:?}", output);
+    if let Some(output) = output {
+        // Load these once at the start of your program
+        let ps = SyntaxSet::load_defaults_newlines();
+        let ts = ThemeSet::load_defaults();
+        let syntax = ps.find_syntax_by_extension("c").unwrap();
+        let mut h = HighlightLines::new(syntax, &ts.themes["base16-ocean.dark"]);
+        for line in LinesWithEndings::from(&output) { // LinesWithEndings enables use of newlines mode
+            let ranges: Vec<(Style, &str)> = h.highlight_line(line, &ps).unwrap();
+            let escaped = as_24_bit_terminal_escaped(&ranges[..], true);
+            print!("{}", escaped);
+        }
+    }
+
 }

@@ -9,3 +9,4 @@ edition = "2021"
 clap = { version = "3.0.0", features = ["derive"] }
 rzpipe = { git = "https://github.com/rizinorg/rz-pipe.git", branch = "master" }
 r2pipe = "0.6.0"
+syntect = "5.0.0"
